@@ -16,7 +16,7 @@ import torch
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from transformers import AutoTokenizer
 
-from utils import *
+from .utils import *
 
 class BertScore:
 
@@ -30,6 +30,8 @@ class BertScore:
                  rescale_with_baseline = None,
                  baseline_path = None,
                  use_fast_tokenizer = False):
+        
+        assert lang is not None or model_type is not None
         
         if device is None:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -50,7 +52,7 @@ class BertScore:
             self._model_type = model_type
         
         if num_layers is None:
-            self._num_layers = model2layers[self.model_type]
+            self._num_layers = model2layers[self._model_type]
         else:
             self._num_layers = num_layers
         
@@ -69,7 +71,7 @@ class BertScore:
         if self.baseline_path is None:
             self.baseline_path = os.path.join(
                 os.path.dirname(__file__),
-                f"rescale_baseline/{self.lang}/{self.model_type}.tsv",
+                f"rescale_baseline/{self.lang}/{self._model_type}.tsv",
             )
 
     def compute_idf(self, idf_sents):
