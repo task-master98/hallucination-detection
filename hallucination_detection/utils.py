@@ -225,7 +225,7 @@ def greedy_cos_idf(ref_embedding, ref_masks, ref_idf,
     else:
         masks = masks.expand(batch_size, -1, -1).contiguous().view_as(similarity)
     
-    masks = masks.float().to(sim.device)
+    masks = masks.float().to(similarity.device)
     similarity = similarity * masks
 
     word_precision = similarity.max(dim=2)[0]
