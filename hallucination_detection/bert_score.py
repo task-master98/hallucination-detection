@@ -71,7 +71,7 @@ class BertScore:
         if self.baseline_path is None:
             self.baseline_path = os.path.join(
                 os.path.dirname(__file__),
-                f"rescale_baseline/{self.lang}/{self._model_type}.tsv",
+                f"rescale_baseline/{self._lang}/{self._model_type}.tsv",
             )
 
     def compute_idf(self, idf_sents):
