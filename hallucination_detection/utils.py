@@ -346,7 +346,7 @@ def compute_bert_score(model, refs, hyps, tokenizer,
             hyp_pads = pad_batch_stats(batch_hyps, stats_dict, device)
 
             P, R, F = greedy_cos_idf(*ref_pads, *hyp_pads, all_layers)
-            preds.append(torch.stack((P, R, F1), dim=-1).cpu())
+            preds.append(torch.stack((P, R, F), dim=-1).cpu())
     
     preds = torch.cat(preds, dim=1 if all_layers else 0)
     return preds
