@@ -118,7 +118,7 @@ class BertScore:
                 max_preds.append(all_preds[start:end].max(dim=0)[0])
             all_preds = torch.stack(max_preds, dim=0)
         
-        if self.rescale_with_baseline:
+        if self._rescale_with_baseline:
             all_preds = (all_preds - self.baseline_vals) / (1 - self.baseline_vals)
         
         out = all_preds[..., 0], all_preds[..., 1], all_preds[..., 2]
