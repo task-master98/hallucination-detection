@@ -98,7 +98,7 @@ class BertScore:
             print("calculating scores...")
             start = time.perf_counter()
         
-        if self.idf:
+        if self._idf:
             assert self._idf_dict, "IDF weights are not computed"
             idf_dict = self._idf_dict        
         else:
