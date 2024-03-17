@@ -197,7 +197,7 @@ def get_bert_embedding(sentences, model, tokenizer, idf_dict,
     return total_embeddings, mask, padded_idf
 
 def greedy_cos_idf(ref_embedding, ref_masks, ref_idf,
-                   hyp_embedding, hyp_masks, hy_idf, all_layers=False):
+                   hyp_embedding, hyp_masks, hyp_idf, all_layers=False):
     
     ref_embedding.div_(torch.norm(ref_embedding, dim=-1).unsqueeze(-1))
     hyp_embedding.div_(torch.norm(hyp_embedding, dim=-1).unsqueeze(-1))
