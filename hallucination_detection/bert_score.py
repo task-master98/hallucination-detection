@@ -1,6 +1,12 @@
 """
 File contains: BERT Score computation class
 """
+import sys
+import os
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(SCRIPT_DIR))
+
 
 import os
 import pathlib
@@ -16,7 +22,7 @@ import torch
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from transformers import AutoTokenizer
 
-from .utils import *
+from hallucination_detection.utils import *
 
 class BertScore:
 
@@ -131,6 +137,17 @@ class BertScore:
         return out
         
 
+if __name__ == "__main__":
+    model_type = None
+    num_layers = None
+    scorer = BertScore(model_type, num_layers, lang="en")
+
+    reference = ["This is a test sentence"]
+    candidate = ["This is a test sentence"]
+
+    # Compute the BERTScore
+
+    P, R, F1 = scorer.score(candidate, reference)
 
 
 
