@@ -123,9 +123,9 @@ def greedy_cos_idf_attn(ref_embedding, ref_masks, ref_idf, ref_q, ref_k, ref_v,
 
     masks = masks.float().to(similarity.device)
     similarity = similarity * masks
-    similarity = similarity * cross_attn_w.transpose(1, 2)
-    word_precision = similarity.max(dim=2)[0]
-    word_recall = similarity.max(dim=1)[0]
+    weighted_sim = similarity * cross_attn_w.transpose(1, 2)
+    word_precision = weighted_sim.max(dim=2)[0]
+    word_recall = weighted_sim.max(dim=1)[0]
 
     hyp_idf.div_(hyp_idf.sum(dim=1, keepdim=True))
     ref_idf.div_(ref_idf.sum(dim=1, keepdim=True))
@@ -173,7 +173,7 @@ def greedy_cos_idf_attn(ref_embedding, ref_masks, ref_idf, ref_q, ref_k, ref_v,
         R = R.masked_fill(ref_zero_mask, 0.0)
     
     F = F.masked_fill(torch.isnan(F), 0.0)
-    return P, R, F    
+    return P, R, F, similarity, cross_attn_w   
 
 def compute_bert_attn_score(model, feature_extractor, 
                       refs, hyps, tokenizer,
@@ -241,6 +241,8 @@ def compute_bert_attn_score(model, feature_extractor,
     iter_range = range(0, len(refs), batch_size)
 
     preds = []
+    attention_weights = []
+    similarity_list = []
     with torch.no_grad():
         for batch_start in iter_range:
             batch_refs = refs[batch_start: batch_start + batch_size]
@@ -249,11 +251,15 @@ def compute_bert_attn_score(model, feature_extractor,
             ref_pads = pad_batch_stats(batch_refs, stats_dict, device)
             hyp_pads = pad_batch_stats(batch_hyps, stats_dict, device)
 
-            P, R, F = greedy_cos_idf_attn(*ref_pads, *hyp_pads, all_layers)
+            P, R, F, similarity, attn_weights = greedy_cos_idf_attn(*ref_pads, *hyp_pads, all_layers)
             preds.append(torch.stack((P, R, F), dim=-1).cpu())
+            attention_weights.append(attn_weights.cpu())
+            similarity_list.append(similarity.cpu())
     
     preds = torch.cat(preds, dim=1 if all_layers else 0)
-    return preds
+    attention_weights = torch.cat(attention_weights, dim=1)
+    similarity_list = torch.cat(similarity_list, dim=1)
+    return preds, similarity_list, attention_weights
 
 
 
